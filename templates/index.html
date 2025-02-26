@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Fluid Mixing Simulation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+    <h1>Entropy & Complexity Simulation</h1>
+    <button onclick="startSimulation()">Start Simulation</button>
+    <br><br>
+    <img id="simulationImage" src="" alt="Simulation will appear here">
+
+    <script>
+        var socket = io.connect("http://127.0.0.1:5000");
+
+        function startSimulation() {
+            socket.emit("start_simulation");
+        }
+
+        socket.on("simulation_update", function(data) {
+            document.getElementById("simulationImage").src = "data:image/png;base64," + data.image;
+        });
+    </script>
+</body>
+</html>
