@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The First Law of Complexodynamics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="diffusion_simulation.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+        .simulation-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .canvas-container {
+            flex: 1;
+            text-align: center;
+            margin: 10px;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            display: block;
+            margin: 10px auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>The First Law of Complexodynamics</h1>
+        <p>A few weeks ago, I had the pleasure of attending FQXi’s Setting Time Aright conference, part of which took place on a cruise from Bergen, Norway to Copenhagen, Denmark. [...]</p>
+        
+        <h2>Why Does Complexity Increase Then Decrease?</h2>
+        <p>Entropy increases monotonically from left to right, but intuitively, the **complexity** seems highest in the middle picture: the one with all the tendrils of milk.</p>
+
+        <!-- 🚀 Diffusion Simulation + Entropy Plot -->
+        <div class="simulation-box">
+            <div class="canvas-container">
+                <h3>⚡ Fluid Diffusion Simulation</h3>
+                <canvas id="diffusionCanvas" width="300" height="300"></canvas>
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                    <button id="startButton" title="Start Simulation">
+                        <img src="assets/play.svg" alt="Start" width="30">
+                    </button>
+                    <button id="restartButton" title="Restart Simulation">
+                        <img src="assets/restart.svg" alt="Restart" width="30">
+                    </button>
+                </div>
+            </div>
+            <div class="canvas-container">
+                <h3>📈 Entropy & Complexity Over Time</h3>
+                <canvas id="entropyChart"></canvas>
+            </div>
+        </div>
+
+        <p>And the same is true for the whole universe: shortly after the big bang, the universe was basically just a low-entropy soup of high-energy particles. [...]</p>
+    </div>
+
+</body>
+</html>
