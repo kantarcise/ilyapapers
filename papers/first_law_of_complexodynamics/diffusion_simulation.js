@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
         drawPixels();
         updateChart();
         
-        if (timeStep < 100) requestAnimationFrame(animateDiffusion);
+        if (timeStep < 50) requestAnimationFrame(animateDiffusion);
     }
 
     function initializeChart() {

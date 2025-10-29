@@ -4,245 +4,512 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The First Law of Complexodynamics</title>
+    <meta name="description" content="Annotated version of Scott Aaronson's The First Law of Complexodynamics with interactive intuition pump and personal notes.">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script defer src="diffusion_simulation.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            line-height: 1.6;
+        :root {
+            color-scheme: light dark;
+            --bg-color: #f6f8fc;
+            --card-color: #ffffff;
+            --accent-color: #2563eb;
+            --accent-muted: #93c5fd;
+            --muted-text: #475569;
+            --border-color: #d8e4f3;
+            --note-bg: #eef2ff;
         }
-        .container {
-            max-width: 900px;
-            margin: auto;
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+            background: var(--bg-color);
+            color: #111827;
+            line-height: 1.7;
+        }
+        .page-frame {
+            max-width: 960px;
+            margin: 48px auto 80px;
+            padding: 48px;
+            background: var(--card-color);
+            border-radius: 20px;
+            box-shadow: 0 30px 60px rgba(15, 23, 42, 0.12);
+        }
+        @media (max-width: 768px) {
+            .page-frame {
+                margin: 20px;
+                padding: 28px 20px;
+            }
+        }
+        .page-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 24px;
+        }
+        .breadcrumbs {
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+        }
+        .breadcrumbs a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .breadcrumbs a:hover,
+        .breadcrumbs a:focus {
+            text-decoration: underline;
+        }
+        .page-header h1 {
+            font-size: clamp(2.2rem, 5vw, 2.8rem);
+            margin: 0 0 12px;
+        }
+        .page-subtitle {
+            margin: 0 0 16px;
+            color: var(--muted-text);
+            font-size: 1.05rem;
+        }
+        .paper-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px 24px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .paper-meta li {
+            background: rgba(37, 99, 235, 0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 16px;
+        }
+        .paper-meta strong {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--muted-text);
+            margin-bottom: 4px;
+        }
+        .paper-meta a {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        .paper-meta a:hover,
+        .paper-meta a:focus {
+            text-decoration: underline;
+        }
+        main {
+            margin-top: 32px;
+        }
+        section + section,
+        section + article,
+        article + section {
+            margin-top: 48px;
+        }
+        .paper-overview {
+            background: var(--note-bg);
+            border-radius: 16px;
+            padding: 24px 28px;
+            border: 1px solid var(--border-color);
+        }
+        .paper-overview h2 {
+            margin: 0 0 8px;
+            font-size: 1.4rem;
+        }
+        .paper-overview p {
+            margin: 0 0 12px;
+            color: var(--muted-text);
+        }
+        .paper-overview ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .paper-overview li {
+            margin-bottom: 6px;
+        }
+        .reader-note {
+            margin: 0;
+            background: #fef9c3;
+            border-left: 4px solid #eab308;
+            border-radius: 12px;
+            padding: 18px 20px;
+            font-style: italic;
+            color: #854d0e;
+        }
+        .reader-note strong {
+            font-style: normal;
+            color: #713f12;
+        }
+        .original-article p {
+            margin-top: 0;
+            margin-bottom: 18px;
+        }
+        .original-article ol {
+            margin: 0 0 18px 22px;
+        }
+        .original-article li {
+            margin-bottom: 10px;
+        }
+        figure.article-figure {
+            margin: 24px auto;
+            text-align: center;
+        }
+        figure.article-figure img {
+            max-width: 100%;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+        }
+        figure.article-figure figcaption {
+            font-size: 0.9rem;
+            color: var(--muted-text);
+            margin-top: 8px;
         }
         .simulation-box {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             flex-wrap: wrap;
+            gap: 24px;
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 24px;
+            border-radius: 20px;
+            margin: 24px 0;
         }
         .canvas-container {
-            flex: 1;
+            flex: 1 1 280px;
             text-align: center;
-            margin: 10px;
+        }
+        .canvas-container h3 {
+            margin-top: 0;
+            color: #93c5fd;
         }
         canvas {
-            border: 1px solid black;
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            border-radius: 10px;
+            background: #ffffff;
+        }
+        .simulation-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 12px;
         }
         button {
-            padding: 10px 15px;
-            font-size: 16px;
+            padding: 10px 16px;
+            font-size: 15px;
             cursor: pointer;
+            border-radius: 999px;
+            border: none;
+            background: #10b981;
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        button:hover,
+        button:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 18px rgba(16, 185, 129, 0.25);
+        }
+        button.secondary {
+            background: #f97316;
+        }
+        button img {
             display: block;
-            margin: 10px auto;
+        }
+        .simulation-note {
+            font-size: 0.9rem;
+            color: #cbd5f5;
+            margin-top: 8px;
+            text-align: center;
+        }
+        .next-steps {
+            border-left: 3px solid var(--accent-muted);
+            padding-left: 16px;
+            color: var(--muted-text);
+        }
+        .next-steps ul {
+            margin: 12px 0 0;
+            padding-left: 18px;
+        }
+        .next-steps li {
+            margin-bottom: 8px;
+        }
+        .paper-footer {
+            border-top: 1px solid var(--border-color);
+            margin-top: 56px;
+            padding-top: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            color: var(--muted-text);
+        }
+        .paper-footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+        .paper-footer a:hover,
+        .paper-footer a:focus {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
+    <div class="page-frame">
+        <header class="page-header">
+            <nav class="breadcrumbs" aria-label="Breadcrumb">
+                <a href="../../index.html">← Back to all papers</a>
+            </nav>
+            <h1>The First Law of Complexodynamics</h1>
+            <p class="page-subtitle">Annotated notes and an intuition pump for the first paper in Ilya Sutskever’s reading list.</p>
+            <ul class="paper-meta">
+                <li><strong>Author</strong>Scott Aaronson</li>
+                <li><strong>Published</strong>September 2011</li>
+                <li><strong>Source</strong><a href="https://scottaaronson.blog/?p=762" target="_blank" rel="noopener">Scott Aaronson’s Blog</a></li>
+                <li><strong>Theme</strong>Complexity, entropy, algorithmic information</li>
+            </ul>
+        </header>
 
-    <div class="container">
-        <h1>The First Law of Complexodynamics</h1>
+        <main id="main-content">
+            <section class="paper-overview" aria-label="Paper overview">
+                <h2>Quick Orientation</h2>
+                <p>Scott Aaronson proposes a “First Law of Complexodynamics” that tries to capture why interesting structure peaks mid-way when systems mix—think coffee and milk swirling together before becoming uniform.</p>
+                <ul>
+                    <li>Contrast between entropy (always increasing) and perceived complexity (peaks then declines).</li>
+                    <li>Kolmogorov sophistication as a possible bridge, and why resource bounds matter.</li>
+                    <li>An open challenge: formalise complextropy in concrete systems such as a discretised coffee cup.</li>
+                </ul>
+            </section>
 
-        <p><a href="https://scottaaronson.blog/?p=762">Link to the original post.</a></p>
-        
-        <blockquote>
-            <p>My comments are blockquoted. The main text is all from the article itself.</p>
-        </blockquote>
+            <article class="original-article" aria-label="Original article text">
+                <!-- Author's annotation -->
+                <blockquote class="reader-note">
+                    <strong>Reader note:</strong> My additions and experiments stay in note blocks like this one. The paragraphs below are Scott Aaronson’s words.
+                </blockquote>
 
-        <p>A few weeks ago, I had the pleasure of attending FQXi's <a href="http://fqxi.org/conference/2011">Setting Time Aright</a> conference, 
-            part of which took place on a cruise from Bergen, Norway to Copenhagen, Denmark. (Why aren't theoretical computer science 
-            conferences ever held on cruises? If nothing else, it certainly cuts down on attendees sneaking away from the conference venue.)  
-            This conference brought together physicists, cosmologists, philosophers, biologists, psychologists, and (for some strange reason) 
-            one quantum complexity blogger to pontificate about the existence, directionality, and nature of time. If you want to know 
-            more about the conference, check out Sean Carroll's <em>Cosmic Variance</em> posts 
-            <a href="http://blogs.discovermagazine.com/cosmicvariance/2011/09/01/ten-things-everyone-should-know-about-time/">here</a> and 
-            <a href="http://blogs.discovermagazine.com/cosmicvariance/2011/08/26/time-is-out-of-joint/">here</a>.
-        </p>
-        
-        <p>Sean also delivered the <a href="http://www.slideshare.net/seanmcarroll/setting-time-aright">opening talk</a> of the conference, during 
-            which (among other things) he asked a beautiful question: <em>why does  "complexity" or  "interestingness" of physical 
-                systems seem to increase with time and then hit a maximum and decrease, in contrast to the entropy, which of course increases monotonically?</em></p>
-        
-        <p>My purpose, in this post, is to sketch a possible answer to Sean's question, drawing on concepts from Kolmogorov complexity.  
-            If this answer has been suggested before, I'm sure someone will let me know in the comments section.</p>
-        
-        <p>First, some background: we all know the <a href="http://en.wikipedia.org/wiki/Second_law_of_thermodynamics">Second Law</a>, which says that 
-            the <em>entropy</em> of any closed system tends to increase with time until it reaches a maximum value.  Here  "entropy" is 
-            slippery to define─we'll come back to that later─ but somehow measures how  "random" or  "generic" or "disordered" a system is. 
-        </p> 
-            
-        <p>As Sean points out in his wonderful book <a href="http://www.amazon.com/Eternity-Here-Quest-Ultimate-Theory/dp/0452296544/lecturenotesonge">From Eternity to Here</a>, 
-            the Second Law is <em>almost</em> a tautology: how could a system <em>not</em> tend to evolve to more  "generic" configurations?  if it didn't, those 
-            configurations wouldn't <em>be</em> generic!  So the real question is not why the entropy is increasing, but why it was ever low to begin with.</p> 
-            
-        <p>In other words, why did the universe's initial state at the big bang contain so much order for the universe's subsequent evolution 
-            to destroy?  I won't address that celebrated mystery in this post, but will simply take the low entropy of the initial state as given.</p>
+                <!-- Original Article: Conference background -->
+                <p>A few weeks ago, I had the pleasure of attending FQXi's <a href="http://fqxi.org/conference/2011">Setting Time Aright</a> conference, 
+                    part of which took place on a cruise from Bergen, Norway to Copenhagen, Denmark. (Why aren't theoretical computer science 
+                    conferences ever held on cruises? If nothing else, it certainly cuts down on attendees sneaking away from the conference venue.)  
+                    This conference brought together physicists, cosmologists, philosophers, biologists, psychologists, and (for some strange reason) 
+                    one quantum complexity blogger to pontificate about the existence, directionality, and nature of time. If you want to know 
+                    more about the conference, check out Sean Carroll's <em>Cosmic Variance</em> posts 
+                    <a href="http://blogs.discovermagazine.com/cosmicvariance/2011/09/01/ten-things-everyone-should-know-about-time/">here</a> and 
+                    <a href="http://blogs.discovermagazine.com/cosmicvariance/2011/08/26/time-is-out-of-joint/">here</a>.
+                </p>
+                
+                <!-- Original Article: Sean Carroll's question -->
+                <p>Sean also delivered the <a href="http://www.slideshare.net/seanmcarroll/setting-time-aright">opening talk</a> of the conference, during 
+                    which (among other things) he asked a beautiful question: <em>why does  "complexity" or  "interestingness" of physical 
+                        systems seem to increase with time and then hit a maximum and decrease, in contrast to the entropy, which of course increases monotonically?</em></p>
+                
+                <!-- Original Article: Purpose statement -->
+                <p>My purpose, in this post, is to sketch a possible answer to Sean's question, drawing on concepts from Kolmogorov complexity.  
+                    If this answer has been suggested before, I'm sure someone will let me know in the comments section.</p>
+                
+                <!-- Original Article: Entropy refresher -->
+                <p>First, some background: we all know the <a href="http://en.wikipedia.org/wiki/Second_law_of_thermodynamics">Second Law</a>, which says that 
+                    the <em>entropy</em> of any closed system tends to increase with time until it reaches a maximum value.  Here  "entropy" is 
+                    slippery to define─we'll come back to that later─ but somehow measures how  "random" or  "generic" or "disordered" a system is. 
+                </p> 
+                    
+                <!-- Original Article: Initial condition puzzle -->
+                <p>As Sean points out in his wonderful book <a href="http://www.amazon.com/Eternity-Here-Quest-Ultimate-Theory/dp/0452296544/lecturenotesonge">From Eternity to Here</a>, 
+                    the Second Law is <em>almost</em> a tautology: how could a system <em>not</em> tend to evolve to more  "generic" configurations?  if it didn't, those 
+                    configurations wouldn't <em>be</em> generic!  So the real question is not why the entropy is increasing, but why it was ever low to begin with.</p> 
+                    
+                <!-- Original Article: Low entropy starting point -->
+                <p>In other words, why did the universe's initial state at the big bang contain so much order for the universe's subsequent evolution 
+                    to destroy?  I won't address that celebrated mystery in this post, but will simply take the low entropy of the initial state as given.</p>
 
-        <p>The point that interests us is this: even though isolated physical systems get monotonically more entropic, they <em>don't</em> get monotonically 
-            more  "complicated" or  "interesting."
-            Sean didn't define what he meant by  "complicated" or  "interesting" here─indeed, defining those concepts was part of his 
-            challenge─but he illustrated what he had in mind with the example of a coffee cup. Shamelessly ripping off his slides:
-        </p>
+                <!-- Original Article: Complexity intuition -->
+                <p>The point that interests us is this: even though isolated physical systems get monotonically more entropic, they <em>don't</em> get monotonically 
+                    more  "complicated" or  "interesting."
+                    Sean didn't define what he meant by  "complicated" or  "interesting" here─indeed, defining those concepts was part of his 
+                    challenge─but he illustrated what he had in mind with the example of a coffee cup. Shamelessly ripping off his slides:
+                </p>
 
-        <!-- 🖼️ Coffee Cup Image -->
-        <!-- 
-            <a href="https://149663533.v2.pressablecdn.com/coffee-lrg.jpg">
-            <img class="responsive-img" src="https://149663533.v2.pressablecdn.com/coffee-small.jpg" alt="Coffee Cup Mixing">
-        </a>
-        -->
+                <figure class="article-figure">
+                    <img src="https://149663533.v2.pressablecdn.com/coffee-lrg.jpg" alt="Coffee cup diffusion example showing rising and falling complexity" />
+                    <figcaption>Entropy grows steadily, yet perceptual complexity peaks mid-swirl.</figcaption>
+                </figure>
 
-        <img src="https://149663533.v2.pressablecdn.com/coffee-lrg.jpg" alt="Entropy and Complexity" />
+                <!-- Reader addition: simulation intro -->
+                <aside class="simulation-box" aria-label="Interactive coffee and milk simulation">
+                    <div class="canvas-container">
+                        <h3>⚡ Fluid Diffusion Simulation</h3>
+                        <canvas id="diffusionCanvas" width="300" height="300"></canvas>
+                        <div class="simulation-controls">
+                            <button id="startButton" aria-label="Start simulation">
+                                <img src="assets/play.svg" alt="" width="22" height="22">
+                                Start
+                            </button>
+                            <button id="restartButton" class="secondary" aria-label="Restart simulation">
+                                <img src="assets/restart.svg" alt="" width="22" height="22">
+                                Restart
+                            </button>
+                        </div>
+                        <p class="simulation-note">Watch how structure blooms then fades as mixing continues.</p>
+                    </div>
+                    <div class="canvas-container">
+                        <h3>📈 Entropy &amp; Complexity Over Time</h3>
+                        <canvas id="entropyChart"></canvas>
+                    </div>
+                </aside>
 
-        
-        <blockquote>
-            <p>Let's understand this concept with a simple simulation.</p>
-        </blockquote>
+                <!-- Original Article: Coffee cup insight -->
+                <p>Entropy increases monotonically from left to right, but intuitively, the  "complexity " seems highest in the <em>middle</em> picture: 
+                    the one with all the tendrils of milk.  And same is true for the whole universe: shortly after the big bang, the universe 
+                    was basically just a low-entropy soup of high-energy particles.  A googol years from now, after the last black holes have 
+                    sputtered away in bursts of Hawking radiation, the universe will basically be just a <em>high</em>-entropy soup of <em>low</em>-energy 
+                    particles.  But today, in between, the universe contains interesting structures such as galaxies and brains and hot-dog-shaped 
+                    novelty vehicles.  We see the pattern:</p>
+                
+                <figure class="article-figure">
+                    <img src="https://149663533.v2.pressablecdn.com/complexity-lrg.jpg" alt="Complexity curve rising then falling against entropy" />
+                    <figcaption>Scott’s sketch of entropy versus perceived complexity.</figcaption>
+                </figure>
 
-        <!-- 🚀 Diffusion Simulation + Entropy Plot -->
-        <div class="simulation-box">
-            <div class="canvas-container">
-                <h3>⚡ Fluid Diffusion Simulation</h3>
-                <canvas id="diffusionCanvas" width="300" height="300"></canvas>
-                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
-                    <button id="startButton" title="Start Simulation">
-                        <img src="assets/play.svg" alt="Start" width="30">
-                    </button>
-                    <button id="restartButton" title="Restart Simulation">
-                        <img src="assets/restart.svg" alt="Restart" width="30">
-                    </button>
-                </div>
-            </div>
-            <div class="canvas-container">
-                <h3>📈 Entropy & Complexity Over Time</h3>
-                <canvas id="entropyChart"></canvas>
-            </div>
-        </div>
+                <!-- Original Article: Challenge statement -->
+                <p>In answering Sean's provocative question (whether there's some  "law of complexodynamics " that would explain his graph), it 
+                    seems to me that the challenge is twofold:</p>
+                <ol>
+                    <li>Come up with a plausible formal definition of  "complexity."</li>
+                    <li>Prove that the  "complexity," so defined, is large at intermediate times in natural model 
+                        systems, despite being close to zero at the initial time and close to zero at late times.</li>
+                </ol>
 
-        <p>Entropy increases monotonically from left to right, but intuitively, the  "complexity " seems highest in the <em>middle</em> picture: 
-            the one with all the tendrils of milk.  And same is true for the whole universe: shortly after the big bang, the universe 
-            was basically just a low-entropy soup of high-energy particles.  A googol years from now, after the last black holes have 
-            sputtered away in bursts of Hawking radiation, the universe will basically be just a <em>high</em>-entropy soup of <em>low</em>-energy 
-            particles.  But today, in between, the universe contains interesting structures such as galaxies and brains and hot-dog-shaped 
-            novelty vehicles.  We see the pattern:</p>
-        
-        <!--
-        <p><a href="https://149663533.v2.pressablecdn.com/complexity-lrg.jpg"><img decoding="async" class="aligncenter" src="https://149663533.v2.pressablecdn.com/complexity-small.jpg" alt="" width="444" height="341"></a></p>
-        -->
+                <!-- Original Article: Entropy upper bound -->
+                <p>To clarify: it's not hard to explain, at least at a handwaving level, why the complexity should be close to zero at the initial time.  It's because we assumed the entropy is close to zero, and entropy plausibly gives an upper bound on complexity.  Nor is it hard to explain why the complexity should be close to zero at late times: it's because the system reaches equilibrium (i.e., something resembling the uniform distribution over all possible states), which we're essentially defining to be simple.  At intermediate times, neither of those constraints is operative, and therefore the complexity could become large.  But does it become large?  How large?  How could we predict?  And what kind of "complexity" are we talking about, anyway?</p>
 
-        <img src="https://149663533.v2.pressablecdn.com/complexity-lrg.jpg" alt="Complexity" />
+                <!-- Original Article: Sophistication intro -->
+                <p>After thinking on and off about these questions, I now conjecture that they can be answered using a notion called sophistication from the theory of Kolmogorov complexity.  Recall that the Kolmogorov complexity of a string x is the length of the shortest computer program that outputs x (in some Turing-universal programming language—the exact choice can be shown not to matter much).  Sophistication is a more … well, sophisticated concept, but we'll get to that later.</p>
 
-        <p>In answering Sean's provocative question (whether there's some  "law of complexodynamics " that would explain his graph), it 
-            seems to me that the challenge is twofold:</p>
-        <ol>
-        <li>Come up with a plausible formal definition of  "complexity. "</li>
-        <li>Prove that the  "complexity, " so defined, is large at intermediate times in natural model 
-            systems, despite being close to zero at the initial time and close to zero at late times.</li>
-        </ol>
-        <p>To clarify: it's not hard to explain, at least at a handwaving level, why the complexity 
-            should be close to zero at the initial time.  It's because we assumed the <em>entropy</em> is close 
-            to zero, and entropy plausibly gives an upper bound on complexity.  Nor is it hard to explain why the 
-            complexity should be close to zero at late times: it's because the system reaches equilibrium (i.e., 
-            something resembling the uniform distribution over all possible states), which we're essentially <em>defining</em> to be 
-            simple.  At intermediate times, neither of those constraints is operative, and therefore the complexity <em>could</em> become large.  
-            But <em>does</em> it become large?  How large?  How could we predict?  And what kind of  "complexity " are we talking about, anyway?</p>
-        <p>After thinking on and off about these questions, I now conjecture that they can be answered using a notion 
-            called <a href="http://people.cs.uchicago.edu/~fortnow/papers/soph.pdf">sophistication</a> from the theory 
-            of <a href="http://en.wikipedia.org/wiki/Kolmogorov_complexity">Kolmogorov complexity</a>.  Recall that the <em>Kolmogorov complexity</em> of a 
-            string x is the length of the shortest computer program that outputs x (in some Turing-universal programming language─the exact choice 
-            can be shown not to matter much).  Sophistication is a more &#8230; well, sophisticated concept, but we'll get to that later.
-        </p>
-        <p>As a first step, let's use Kolmogorov complexity to define <em>entropy</em>.  Already it's not quite obvious how to do that.  If you 
-            start, say, a cellular automaton, or a system of billiard balls, in some simple initial configuration, and then let it evolve for 
-            a while according to dynamical laws, visually it will look like the entropy is going up.  But if the system happens to be <em>deterministic</em>, 
-            then mathematically, its state can always be specified by giving (1) the initial state, and (2) the number of steps t it's been run for.  
-            The former takes a constant number of bits to specify (independent of t), while the latter takes log(t) bits.  It follows that, if we use 
-            Kolmogorov complexity as our stand-in for entropy, then the entropy can increase at most <em>logarithmically</em> with t─much slower than 
-            the linear or polynomial increase that we'd intuitively expect.
-        </p>
-        <p>There are at least two ways to solve this problem.  The first is to consider probabilistic systems, rather than deterministic 
-            ones.  In the probabilistic case, the Kolmogorov complexity really does increase at a polynomial rate, as you'd expect.  
-            The second solution is to replace the Kolmogorov complexity by the <em>resource-bounded Kolmogorov complexity</em>: the length 
-            of the shortest computer program that outputs the state <em>in a short amount of time</em> (or the size of the smallest, say, depth-3 
-            circuit that outputs the state─for present purposes, it doesn't even matter much what kind of resource bound we impose, as long as 
-            the bound is severe enough).  Even though there's a computer program only log(t) bits long to compute the state of the system after t time 
-            steps, that program will typically use an amount of <em>time</em> that grows with t (or even faster), so if we rule out sufficiently complex 
-            programs, we can again get our program size to increase with t at a polynomial rate.</p>
-        <p>OK, that was entropy.  What about the thing Sean was calling  "complexity "─which, to avoid confusion with other kinds of complexity, 
-            from now on I'm going to call  "complextropy "?  For this, we're going to need a cluster of related ideas that go under names like sophistication,
-            Kolmogorov structure functions, and algorithmic statistics.  The backstory is that, in the 1970s (<em>after</em> introducing Kolmogorov complexity), 
-            Kolmogorov made an observation that was closely related to Sean's observation above.  A uniformly random string, he said, has close-to-maximal
-             Kolmogorov complexity, but it's also one of the <em>least</em>  "complex " or  "interesting " strings imaginable.  After all, we can describe 
-             essentially everything you'd ever want to know about the string by saying  "it's random "!  But is there a way to formalize that intuition?  
-             Indeed there is.</p>
-        <p>First, given a set S of n-bit strings, let K(S) be the number of bits in the shortest computer program that outputs the elements of S and then halts. 
-            Also, given such a set S and an element x of S, let K(x|S) be the length of the shortest program that outputs x, given an oracle for testing 
-            membership in S.  Then we can let the <em>sophistication</em> of x, or Soph(x), be the smallest possible value of K(S), over all sets S such that</p>
-        <ol>
-        <li>x∈S and</li>
-        <li>K(x|S) ≥ log<sub>2</sub>(|S|) &#8211; c, for some constant c.  (In other words, one can distill all the  "nonrandom " information in 
-            x just by saying that x belongs that S.)</li>
-        </ol>
-        <p>Intuitively, Soph(x) is the length of the shortest computer program that describes, not necessarily x itself, but a set S of which x is a 
-            "random" or  "generic" member.  To illustrate, any string x with small Kolmogorov complexity has small sophistication, since we can let S be 
-            the singleton set {x}.  However, a uniformly-random string <em>also</em> has small sophistication, since we can let S be the 
-            set {0,1}<sup>n</sup> of all n-bit strings.  In fact, the question arises of whether there are <em>any</em> sophisticated strings! 
-            Apparently, after Kolmogorov raised this question in the early 1980s, it was answered in the affirmative by Alexander Shen (for more, 
-            see <a href="http://homepages.cwi.nl/~paulv/papers/algorithmicstatistics.pdf">this paper</a> by Gács, Tromp, and Vitányi).  The construction is via 
-            a diagonalization argument that's a bit too complicated to fit in this blog post.</p>
-        <p>But what does any of this have to do with coffee cups?  Well, at first glance, sophistication seems to have exactly the properties 
-            that we were looking for in a  "complextropy " measure: it's small for both simple strings <em>and</em> uniformly random strings, but 
-            large for strings in a weird third category of  "neither simple nor random. "  Unfortunately, as we defined it above, sophistication still 
-            doesn't do the job.  For deterministic systems, the problem is the same as the one pointed out earlier for Kolmogorov complexity: we can 
-            always describe the system's state after t time steps by specifying the initial state, the transition rule, and t.  Therefore the sophistication 
-            can never exceed log(t)+c.  Even for probabilistic systems, though, we can specify <em>the set S(t) of all possible states</em> after t time 
-            steps by specifying the initial state, the probabilistic transition rule, and t.  And, at least assuming that the probability distribution 
-            over S(t) is uniform, by a simple counting argument the state after t steps will almost always be a  "generic " element of S(t).  So again, 
-            the sophistication will almost never exceed log(t)+c.  (If the distribution over S(t) is nonuniform, then some technical further arguments are 
-            needed, which I omit.)</p>
-        <p>How can we fix this problem?  I think the key is to bring computational resource bounds into the picture.  (We already saw a hint of this 
-            in the discussion of entropy.)  In particular, suppose we define the complextropy of an n-bit string x to be something like the following:</p>
-        <p style="padding-left: 30px;"><em>the number of bits in the shortest computer program that runs in n log(n) time, and that outputs a 
-            nearly-uniform sample from a set S such that (i) x∈S, and (ii) any computer program that outputs x in n log(n) time, given an oracle that 
-            provides independent, uniform samples from S, has at least log<sub>2</sub>(|S|)-c bits, for some constant c.</em></p>
-        <p>Here n log(n) is just intended as a concrete example of a complexity bound: one could replace it with some other time bound, or a restriction 
-            to (say) constant-depth circuits or some other weak model of computation.  The motivation for the definition is that we want <em>some</em>  
-            "complextropy" measure that will assign a value close to 0 to the first and third coffee cups in the picture, but a large value to the second 
-            coffee cup.  And thus we consider the length of the shortest efficient computer program that outputs, not necessarily the target string x itself, 
-            but a sample from a probability distribution D such that x is not efficiently compressible with respect to D.  (In other words, x looks to any 
-            efficient algorithm like a  "random " or  "generic " sample from D.)</p>
-        <p>Note that it's essential for this definition that we imposed a computational efficiency requirement in <em>two</em> places: on the sampling 
-            algorithm, and <em>also</em> on the algorithm that reconstructs x given the sampling oracle.  Without the first efficiency constraint, the 
-            complextropy could never exceed log(t)+c by the previous argument.  Meanwhile, without the second efficiency constraint, the 
-            complextropy <em>would</em> increase, but then it would probably keep right on increasing, for the following reason: a time-bounded sampling 
-            algorithm wouldn't be able to sample from <em>exactly</em> the right set S, only a reasonable facsimile thereof, and a reconstruction 
-            algorithm with <em>unlimited time</em> could probably then use special properties of the target string x to reconstruct x with fewer 
-            than log<sub>2</sub>(|S|)-c bits.</p>
-        <p>But as long as we remember to put computational efficiency requirements on <em>both</em> algorithms, I <em>conjecture</em> that the 
-            complextropy will satisfy the  "First Law of Complexodynamics, " exhibiting exactly the behavior that Sean wants: small for the initial 
-            state, large for intermediate states, then small again once the mixing has finished.  I don't yet know how to prove this conjecture. 
-            But crucially, it's <em>not</em> a hopelessly open-ended question that one tosses out just to show how wide-ranging one's thoughts are, 
-            but a relatively-bounded question about which actual theorems could be proved and actual papers published.</p>
-        <p>If you want to do so, the first step will be to  "instantiate " everything I said above with a particular model system and particular 
-            resource constraints.  One good choice could be a discretized  "coffee cup, " consisting of a 2D array of black and white 
-            pixels (the  "coffee " and  "milk "), which are initially in separated components and then subject to random nearest-neighbor mixing 
-            dynamics.  (E.g., at each time step, we pick an adjacent coffee pixel and milk pixel uniformly at random, and swap the two.)  Can 
-            we show that for such a system, the complextropy becomes large at intermediate times (intuitively, because of the need to specify the 
-            irregular <em>boundaries</em> between the regions of all-black pixels, all-white pixels, and mixed black-and-white pixels)?</p>
-        <p>One could try to show such a statement either theoretically or empirically.  Theoretically, I have no idea where to begin in proving it, 
-            despite a clear intuition that such a statement should hold: let me toss it out as a wonderful (I think) open problem!  At an empirical 
-            level, one could simply try to <em>plot</em> the complextropy in some simulated system, like the discrete coffee cup, and show that it has 
-            the predicted small-large-small behavior.   One obvious difficulty here is that the complextropy, under any definition like the one I gave, 
-            is almost certainly going to be intractable to compute or even approximate.  However, one could try to get around that problem the same way 
-            many others have, in empirical research inspired by Kolmogorov complexity: namely, by using something you <em>can</em> compute (e.g., the 
-            size of a gzip compressed file) as a rough-and-ready substitute for something you <em>can't</em> compute (e.g., the Kolmogorov complexity K(x)). 
-            In the interest of a full disclosure, a wonderful MIT undergrad, Lauren Oullette, recently started a research project with me where she's 
-            trying to do exactly that.  So hopefully, by the end of the semester, we'll be able to answer Sean's question at least at a physics level 
-            of rigor!  Answering the question at a math/CS level of rigor could take a while longer.</p>
-        <p>PS (unrelated). Are neutrinos traveling faster than light?  See <a href="http://www.xkcd.com/955/">this xkcd strip</a> (which does what 
-            I was trying to do in the Deolalikar affair, but better).</p>
+                <!-- Original Article: Kolmogorov for entropy -->
+                <p>As a first step, let's use Kolmogorov complexity to define entropy.  Already it's not quite obvious how to do that.  If you start, say, a cellular automaton, or a system of billiard balls, in some simple initial configuration, and then let it evolve for a while according to dynamical laws, visually it will look like the entropy is going up.  But if the system happens to be deterministic, then mathematically, its state can always be specified by giving (1) the initial state, and (2) the number of steps t it's been run for.  The former takes a constant number of bits to specify (independent of t), while the latter takes log(t) bits.  It follows that, if we use Kolmogorov complexity as our stand-in for entropy, then the entropy can increase at most logarithmically with t—much slower than the linear or polynomial increase that we'd intuitively expect.</p>
 
+                <!-- Original Article: Two fixes -->
+                <p>There are at least two ways to solve this problem.  The first is to consider probabilistic systems, rather than deterministic ones.  In the probabilistic case, the Kolmogorov complexity really does increase at a polynomial rate, as you'd expect.  
+                    The second solution is to replace the Kolmogorov complexity by the <em>resource-bounded Kolmogorov complexity</em>: the length 
+                    of the shortest computer program that outputs the state <em>in a short amount of time</em> (or the size of the smallest, say, depth-3 
+                    circuit that outputs the state─for present purposes, it doesn't even matter much what kind of resource bound we impose, as long as 
+                    the bound is severe enough).  Even though there's a computer program only log(t) bits long to compute the state of the system after t time 
+                    steps, that program will typically use an amount of <em>time</em> that grows with t (or even faster), so if we rule out sufficiently complex 
+                    programs, we can again get our program size to increase with t at a polynomial rate.</p>
+
+                <!-- Original Article: Complextropy term -->
+                <p>OK, that was entropy.  What about the thing Sean was calling  "complexity "─which, to avoid confusion with other kinds of complexity, 
+                    from now on I'm going to call  "complextropy "?  For this, we're going to need a cluster of related ideas that go under names like sophistication,
+                    Kolmogorov structure functions, and algorithmic statistics.  The backstory is that, in the 1970s (<em>after</em> introducing Kolmogorov complexity), 
+                    Kolmogorov made an observation that was closely related to Sean's observation above.  A uniformly random string, he said, has close-to-maximal
+                    Kolmogorov complexity, but it's also one of the <em>least</em>  "complex " or  "interesting " strings imaginable.  After all, we can describe 
+                    essentially everything you'd ever want to know about the string by saying  "it's random "!  But is there a way to formalize that intuition?  
+                    Indeed there is.</p>
+
+                <!-- Original Article: Sophistication definition -->
+                <p>First, given a set S of n-bit strings, let K(S) be the number of bits in the shortest computer program that outputs the elements of S and then halts. 
+                    Also, given such a set S and an element x of S, let K(x|S) be the length of the shortest program that outputs x, given an oracle for testing 
+                    membership in S.  Then we can let the <em>sophistication</em> of x, or Soph(x), be the smallest possible value of K(S), over all sets S such that</p>
+                <ol>
+                    <li>x∈S and</li>
+                    <li>K(x|S) ≥ log<sub>2</sub>(|S|) &#8211; c, for some constant c.  (In other words, one can distill all the  "nonrandom " information in 
+                        x just by saying that x belongs that S.)</li>
+                </ol>
+
+                <!-- Original Article: Sophistication intuition -->
+                <p>Intuitively, Soph(x) is the length of the shortest computer program that describes, not necessarily x itself, but a set S of which x is a 
+                    "random" or  "generic" member.  To illustrate, any string x with small Kolmogorov complexity has small sophistication, since we can let S be the 
+                    singleton set {x}.  However, a uniformly-random string <em>also</em> has small sophistication, since we can let S be the 
+                    set {0,1}<sup>n</sup> of all n-bit strings.  In fact, the question arises of whether there are <em>any</em> sophisticated strings! 
+                    Apparently, after Kolmogorov raised this question in the early 1980s, it was answered in the affirmative by Alexander Shen (for more, 
+                    see <a href="http://homepages.cwi.nl/~paulv/papers/algorithmicstatistics.pdf">this paper</a> by Gács, Tromp, and Vitányi).  The construction is via 
+                    a diagonalization argument that's a bit too complicated to fit in this blog post.</p>
+
+                <!-- Original Article: Sophistication limitations -->
+                <p>But what does any of this have to do with coffee cups?  Well, at first glance, sophistication seems to have exactly the properties 
+                    that we were looking for in a  "complextropy " measure: it's small for both simple strings <em>and</em> uniformly random strings, but 
+                    large for strings in a weird third category of  "neither simple nor random. "  Unfortunately, as we defined it above, sophistication still 
+                    doesn't do the job.  For deterministic systems, the problem is the same as the one pointed out earlier for Kolmogorov complexity: we can 
+                    always describe the system's state after t time steps by specifying the initial state, the transition rule, and t.  Therefore the sophistication 
+                    can never exceed log(t)+c.  Even for probabilistic systems, though, we can specify <em>the set S(t) of all possible states</em> after t time 
+                    steps by specifying the initial state, the probabilistic transition rule, and t.  And, at least assuming that the probability distribution 
+                    over S(t) is uniform, by a simple counting argument the state after t steps will almost always be a  "generic " element of S(t).  So again, 
+                    the sophistication will almost never exceed log(t)+c.  (If the distribution over S(t) is nonuniform, then some technical further arguments are 
+                    needed, which I omit.)</p>
+
+                <!-- Original Article: Resource bounds fix -->
+                <p>How can we fix this problem?  I think the key is to bring computational resource bounds into the picture.  (We already saw a hint of this 
+                    in the discussion of entropy.)  In particular, suppose we define the complextropy of an n-bit string x to be something like the following:</p>
+                <p style="padding-left: 30px;"><em>the number of bits in the shortest computer program that runs in n log(n) time, and that outputs a 
+                    nearly-uniform sample from a set S such that (i) x∈S, and (ii) any computer program that outputs x in n log(n) time, given an oracle that 
+                    provides independent, uniform samples from S, has at least log<sub>2</sub>(|S|)-c bits, for some constant c.</em></p>
+
+                <!-- Original Article: Definition commentary -->
+                <p>Here n log(n) is just intended as a concrete example of a complexity bound: one could replace it with some other time bound, or a restriction 
+                    to (say) constant-depth circuits or some other weak model of computation.  The motivation for the definition is that we want <em>some</em>  
+                    "complextropy" measure that will assign a value close to 0 to the first and third coffee cups in the picture, but a large value to the second 
+                    coffee cup.  And thus we consider the length of the shortest efficient computer program that outputs, not necessarily the target string x itself, 
+                    but a sample from a probability distribution D such that x is not efficiently compressible with respect to D.  (In other words, x looks to any 
+                    efficient algorithm like a  "random " or  "generic " sample from D.)</p>
+
+                <!-- Original Article: Dual resource constraints -->
+                <p>Note that it's essential for this definition that we imposed a computational efficiency requirement in <em>two</em> places: on the sampling 
+                    algorithm, and <em>also</em> on the algorithm that reconstructs x given the sampling oracle.  Without the first efficiency constraint, the 
+                    complextropy could never exceed log(t)+c by the previous argument.  Meanwhile, without the second efficiency constraint, the 
+                    complextropy <em>would</em> increase, but then it would probably keep right on increasing, for the following reason: a time-bounded sampling 
+                    algorithm wouldn't be able to sample from <em>exactly</em> the right set S, only a reasonable facsimile thereof, and a reconstruction 
+                    algorithm with <em>unlimited time</em> could probably then use special properties of the target string x to reconstruct x with fewer 
+                    than log<sub>2</sub>(|S|)-c bits.</p>
+
+                <!-- Original Article: First law conjecture -->
+                <p>But as long as we remember to put computational efficiency requirements on <em>both</em> algorithms, I <em>conjecture</em> that the 
+                    complextropy will satisfy the  "First Law of Complexodynamics, " exhibiting exactly the behavior that Sean wants: small for the initial 
+                    state, large for intermediate states, then small again once the mixing has finished.  I don't yet know how to prove this conjecture. 
+                    But crucially, it's <em>not</em> a hopelessly open-ended question that one tosses out just to show how wide-ranging one's thoughts are, 
+                    but a relatively-bounded question about which actual theorems could be proved and actual papers published.</p>
+
+                <!-- Original Article: Coffee cup model suggestion -->
+                <p>If you want to do so, the first step will be to  "instantiate " everything I said above with a particular model system and particular 
+                    resource constraints.  One good choice could be a discretized  "coffee cup, " consisting of a 2D array of black and white 
+                    pixels (the  "coffee " and  "milk "), which are initially in separated components and then subject to random nearest-neighbor mixing 
+                    dynamics.  (E.g., at each time step, we pick an adjacent coffee pixel and milk pixel uniformly at random, and swap the two.)  Can 
+                    we show that for such a system, the complextropy becomes large at intermediate times (intuitively, because of the need to specify the 
+                    irregular <em>boundaries</em> between the regions of all-black pixels, all-white pixels, and mixed black-and-white pixels)?</p>
+
+                <!-- Original Article: Open problem -->
+                <p>One could try to show such a statement either theoretically or empirically.  Theoretically, I have no idea where to begin in proving it, 
+                    despite a clear intuition that such a statement should hold: let me toss it out as a wonderful (I think) open problem!  At an empirical 
+                    level, one could simply try to <em>plot</em> the complextropy in some simulated system, like the discrete coffee cup, and show that it has 
+                    the predicted small-large-small behavior.   One obvious difficulty here is that the complextropy, under any definition like the one I gave, 
+                    is almost certainly going to be intractable to compute or even approximate.  However, one could try to get around that problem the same way 
+                    many others have, in empirical research inspired by Kolmogorov complexity: namely, by using something you <em>can</em> compute (e.g., the 
+                    size of a gzip compressed file) as a rough-and-ready substitute for something you <em>can't</em> compute (e.g., the Kolmogorov complexity K(x)). 
+                    In the interest of a full disclosure, a wonderful MIT undergrad, Lauren Oullette, recently started a research project with me where she's 
+                    trying to do exactly that.  So hopefully, by the end of the semester, we'll be able to answer Sean's question at least at a physics level 
+                    of rigor!  Answering the question at a math/CS level of rigor could take a while longer.</p>
+
+                <!-- Original Article: Closing -->
+                <p>PS (unrelated). Are neutrinos traveling faster than light?  See <a href="http://www.xkcd.com/955/">this xkcd strip</a> (which does what 
+                    I was trying to do in the Deolalikar affair, but better).</p>
+            </article>
+
+            <section class="next-steps" aria-label="Next steps and references">
+                <h2>Where to go next</h2>
+                <p>Scott leaves the “First Law” as an open invitation. If you want to keep going, try:</p>
+                <ul>
+                    <li>Formalising the diffusion process above and logging gzip-based complexity measurements.</li>
+                    <li>Reading the <a href="http://homepages.cwi.nl/~paulv/papers/algorithmicstatistics.pdf">Gács–Tromp–Vitányi paper</a> he cites for algorithmic statistics foundations.</li>
+                    <li>Checking Sean Carroll’s <em>From Eternity to Here</em> for the thermodynamic backdrop.</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer class="paper-footer">
+            <span>Page maintained by <a href="https://kantarcise.com">Sezai Kantarcı</a>.</span>
+            <span><a href="../../index.html">Back to the full IlyaPapers collection</a></span>
+        </footer>
     </div>
-
 </body>
 </html>
