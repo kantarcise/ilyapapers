@@ -275,10 +275,10 @@
         <main id="main-content">
             <section class="paper-overview" aria-label="Paper overview">
                 <h2>Quick Orientation</h2>
-                <p>Scott Aaronson proposes a “First Law of Complexodynamics” that tries to capture why interesting structure peaks mid-way when systems mix—think coffee and milk swirling together before becoming uniform.</p>
+                <p><a href="https://www.scottaaronson.com/">Scott Aaronson</a> proposes a “First Law of Complexodynamics” that tries to capture why interesting structure peaks mid-way when systems mix—think coffee and milk swirling together before becoming uniform.</p>
                 <ul>
                     <li>Contrast between entropy (always increasing) and perceived complexity (peaks then declines).</li>
-                    <li>Kolmogorov sophistication as a possible bridge, and why resource bounds matter.</li>
+                    <li><a href="https://en.wikipedia.org/wiki/Sophistication_(complexity_theory)">Kolmogorov sophistication</a> as a possible bridge, and why resource bounds matter.</li>
                     <li>An open challenge: formalise complextropy in concrete systems such as a discretised coffee cup.</li>
                 </ul>
             </section>
@@ -299,22 +299,29 @@
                     <a href="http://blogs.discovermagazine.com/cosmicvariance/2011/09/01/ten-things-everyone-should-know-about-time/">here</a> and 
                     <a href="http://blogs.discovermagazine.com/cosmicvariance/2011/08/26/time-is-out-of-joint/">here</a>.
                 </p>
-                
                 <!-- Original Article: Sean Carroll's question -->
                 <p>Sean also delivered the <a href="http://www.slideshare.net/seanmcarroll/setting-time-aright">opening talk</a> of the conference, during 
                     which (among other things) he asked a beautiful question: <em>why does  "complexity" or  "interestingness" of physical 
                         systems seem to increase with time and then hit a maximum and decrease, in contrast to the entropy, which of course increases monotonically?</em></p>
+
+                <blockquote class="reader-note">
+                    Entropy always rises, yet “interestingness” swells, peaks, and fades. Think of cream swirling into coffee—maximally intricate midway, bland at the start and end.
+                </blockquote>
                 
                 <!-- Original Article: Purpose statement -->
                 <p>My purpose, in this post, is to sketch a possible answer to Sean's question, drawing on concepts from Kolmogorov complexity.  
                     If this answer has been suggested before, I'm sure someone will let me know in the comments section.</p>
+
+                <blockquote class="reader-note">
+                    <a href="https://faculty.cc.gatech.edu/~ladha/toc/L17.pdf">Kolmogorov Complexity</a> as a Lens. Kolmogorov complexity (shortest program that produces a state) from algorithmic information theory, becomes Aaronson's microscope for “interestingness.”
+                </blockquote>
                 
                 <!-- Original Article: Entropy refresher -->
                 <p>First, some background: we all know the <a href="http://en.wikipedia.org/wiki/Second_law_of_thermodynamics">Second Law</a>, which says that 
                     the <em>entropy</em> of any closed system tends to increase with time until it reaches a maximum value.  Here  "entropy" is 
                     slippery to define─we'll come back to that later─ but somehow measures how  "random" or  "generic" or "disordered" a system is. 
                 </p> 
-                    
+
                 <!-- Original Article: Initial condition puzzle -->
                 <p>As Sean points out in his wonderful book <a href="http://www.amazon.com/Eternity-Here-Quest-Ultimate-Theory/dp/0452296544/lecturenotesonge">From Eternity to Here</a>, 
                     the Second Law is <em>almost</em> a tautology: how could a system <em>not</em> tend to evolve to more  "generic" configurations?  if it didn't, those 
@@ -351,7 +358,7 @@
                                 Restart
                             </button>
                         </div>
-                        <p class="simulation-note">Watch how structure blooms then fades as mixing continues.</p>
+                        <p class="simulation-note"> <br>Watch how structure blooms then fades as mixing continues.</p>
                     </div>
                     <div class="canvas-container">
                         <h3>📈 Entropy &amp; Complexity Over Time</h3>
@@ -387,8 +394,16 @@
                 <!-- Original Article: Sophistication intro -->
                 <p>After thinking on and off about these questions, I now conjecture that they can be answered using a notion called sophistication from the theory of Kolmogorov complexity.  Recall that the Kolmogorov complexity of a string x is the length of the shortest computer program that outputs x (in some Turing-universal programming language—the exact choice can be shown not to matter much).  Sophistication is a more … well, sophisticated concept, but we'll get to that later.</p>
 
+                <blockquote class="reader-note">
+                    <a href="https://en.wikipedia.org/wiki/Sophistication_(complexity_theory)">Sophistication</a>, a refinement of Kolmogorov complexity, is Aaronson’s candidate. Kolmogorov measures raw descriptiveness; sophistication tries to separate structure from randomness.
+                </blockquote>
+
                 <!-- Original Article: Kolmogorov for entropy -->
                 <p>As a first step, let's use Kolmogorov complexity to define entropy.  Already it's not quite obvious how to do that.  If you start, say, a cellular automaton, or a system of billiard balls, in some simple initial configuration, and then let it evolve for a while according to dynamical laws, visually it will look like the entropy is going up.  But if the system happens to be deterministic, then mathematically, its state can always be specified by giving (1) the initial state, and (2) the number of steps t it's been run for.  The former takes a constant number of bits to specify (independent of t), while the latter takes log(t) bits.  It follows that, if we use Kolmogorov complexity as our stand-in for entropy, then the entropy can increase at most logarithmically with t—much slower than the linear or polynomial increase that we'd intuitively expect.</p>
+
+                <blockquote class="reader-note">
+                    If dynamics are deterministic, the whole future is “initial state + time t.” That only costs log(t) bits, far slower than physical entropy growth. So plain Kolmogorov complexity can’t capture thermodynamic entropy.
+                </blockquote>
 
                 <!-- Original Article: Two fixes -->
                 <p>There are at least two ways to solve this problem.  The first is to consider probabilistic systems, rather than deterministic ones.  In the probabilistic case, the Kolmogorov complexity really does increase at a polynomial rate, as you'd expect.  
@@ -478,6 +493,10 @@
                     we show that for such a system, the complextropy becomes large at intermediate times (intuitively, because of the need to specify the 
                     irregular <em>boundaries</em> between the regions of all-black pixels, all-white pixels, and mixed black-and-white pixels)?</p>
 
+                <blockquote class="reader-note">
+                    A discrete coffee-cup simulation (like the one above!) could track complextropy over time. Aaronson predicts the hump should appear clearly in those measurements.
+                </blockquote>
+
                 <!-- Original Article: Open problem -->
                 <p>One could try to show such a statement either theoretically or empirically.  Theoretically, I have no idea where to begin in proving it, 
                     despite a clear intuition that such a statement should hold: let me toss it out as a wonderful (I think) open problem!  At an empirical 
@@ -493,6 +512,17 @@
                 <!-- Original Article: Closing -->
                 <p>PS (unrelated). Are neutrinos traveling faster than light?  See <a href="http://www.xkcd.com/955/">this xkcd strip</a> (which does what 
                     I was trying to do in the Deolalikar affair, but better).</p>
+
+
+                <blockquote class="reader-note">
+                    <strong>Key Takeaways:</strong> 
+                    <ul>
+                        <li>Entropy tracks randomness and rises monotonically, while complextropy captures structured unpredictability that swells then collapses.</li>
+                        <li>Sophistication separates structure from noise by pairing concise set descriptions with strings that stay generic inside them.</li>
+                        <li>Resource bounds are crucial: to an efficient observer, mid-evolution states look richly patterned yet incompressible.</li>
+                        <li>The “First Law of Complexodynamics” is a standing challenge—prove it or simulate it, coffee cups and all.</li>
+                    </ul>
+                </blockquote>
             </article>
 
             <section class="next-steps" aria-label="Next steps and references">
@@ -501,7 +531,7 @@
                 <ul>
                     <li>Formalising the diffusion process above and logging gzip-based complexity measurements.</li>
                     <li>Reading the <a href="http://homepages.cwi.nl/~paulv/papers/algorithmicstatistics.pdf">Gács–Tromp–Vitányi paper</a> he cites for algorithmic statistics foundations.</li>
-                    <li>Checking Sean Carroll’s <em>From Eternity to Here</em> for the thermodynamic backdrop.</li>
+                    <li>Checking Sean Carroll’s <a href="https://en.wikipedia.org/wiki/From_Eternity_to_Here">From Eternity to Here</a> for the thermodynamic backdrop.</li>
                 </ul>
             </section>
         </main>
